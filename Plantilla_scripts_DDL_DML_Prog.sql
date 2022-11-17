@@ -9,8 +9,7 @@ A continuación, implementa en lenguaje SQL todas las sentencias necesarias para
 
 CREATE DATABASE ...
 CREATE TABLE...
-
-
+SFSDFSD
 /*
 LENGUAJE DE MANIPULACIÓN DE DATOS (RA3 y RA4)
 Este fichero debe tener todas las órdenes necesarias para realizar las operaciones de manipulación exigidas por la etapa de proyecto.*/
