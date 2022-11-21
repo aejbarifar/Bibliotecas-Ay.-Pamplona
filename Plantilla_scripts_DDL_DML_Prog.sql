@@ -98,7 +98,7 @@ where fecha_muerte - fecha_nacimiento > 30
 
 /* Eejercicio 6: Muestra la duración media en horas de las reservas de espacios por cada
 año de aquellos años que tengan una duración media superior a un día.
-Para el año usarás el formato AA */
+Para el año usarás el formato AA */b
 
 SELECT AVG(HOUR(fecha_fin - fecha_inicio)) as "Duracion_Media", year(fecha_inicio)
 from reservas
@@ -117,6 +117,22 @@ CALL ...
 -- Crea una función y pruébala...
 CREATE FUNCTION ...
 SELECT ...
+
+/* Ejercicio 2: Escribe una función que reciba como parámetros una fecha de nacimiento
+y un país. La función devolverá la diferencia en años entre la edad media
+de ese país y la edad correspondiente a la fecha de nacimiento pasada
+por parámetro */
+DELIMITER $$
+CREATE FUNCTION diferencia_media (fecha_nacimiento DATE, pais_origen VARCHAR(30), edad_media INT) RETURNS int 
+BEGIN
+	 DECLARE edad_actual int;
+	 SET edad_actual = DATE(NOW()) - fecha_nacimiento;
+     
+     return edad_actual;
+END
+$$
+DELIMITER ;
+
 -- Crea un trigger y pruébalo...
 CREATE TRIGGER ...
 INSERT...
