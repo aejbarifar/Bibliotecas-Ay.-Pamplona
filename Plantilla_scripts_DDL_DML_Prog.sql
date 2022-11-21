@@ -98,7 +98,7 @@ where fecha_muerte - fecha_nacimiento > 30
 
 /* Eejercicio 6: Muestra la duración media en horas de las reservas de espacios por cada
 año de aquellos años que tengan una duración media superior a un día.
-Para el año usarás el formato AA */b
+Para el año usarás el formato AA */
 
 SELECT AVG(HOUR(fecha_fin - fecha_inicio)) as "Duracion_Media", year(fecha_inicio)
 from reservas
