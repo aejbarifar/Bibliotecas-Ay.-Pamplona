@@ -30,6 +30,12 @@ pais_origen VARCHAR(30),
 CONSTRAINT nombre_completo UNIQUE (nombre,apellidos)
 );
 
+CREATE TABLE IF NOT EXISTS reservas(
+codigo INT PRIMARY KEY,
+fecha_inicio DATETIME NOT NULL,
+fecha_fin DATETIME NOT NULL
+);
+
 
 
 
@@ -61,6 +67,16 @@ INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, 
 INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, `fecha_nacimiento`, `fecha_muerte`, `pais_origen`) VALUES ('1574', 'William', 'Shakespeare', '1564-04-26', '1616-04-23', 'Reino Unido');
 INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, `fecha_nacimiento`, `pais_origen`) VALUES ('5838', 'George', 'Raymond Richard Martin', '1948-10-20', 'Estados Unidos');
 INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, `fecha_nacimiento`, `fecha_muerte`, `pais_origen`) VALUES ('9876', 'Ray', 'Bradbury', '1920-09-22', '2012-06-05', 'Estados Unidos');
+
+INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('1932', '2022-11-21 17:23:05', '2022-11-21 18:30:23');
+INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('1832', '2022-12-18 11:30:00', '2022-12-11 12:30:00');
+INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('6854', '2023-01-12 13:32:12', '2023-01-12 15:00:00');
+INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('6954', '2022-11-21 21:08:00', '2022-11-21 22:30:00');
+INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('6845', '2022-11-01 17:00:00', '2022-11-06 19:00:00');
+INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('9778', '2023-06-19 18:00:00', '2023-06-21 12:00:00');
+INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('3358', '2022-12-13 21:00:00', '2022-12-16 19:00:00');
+INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('9976', '2022-11-28 14:32:00', '2022-11-30 19:00:00');
+
 /*CONSULTAS: Nota: Se incluirá como comentario el enunciado de cada consulta.*/
 
 -- Diseña una consulta para...
@@ -72,7 +88,7 @@ de todos los espacios que tienen Pizarra y Proyector.*/
  from espacios
  where pizarra = true and proyector = true;
 
-/*¿Qué autores tienen más de 30 años y tienen un solo apellido? Ponlo en
+/* Ejercicio 4: ¿Qué autores tienen más de 30 años y tienen un solo apellido? Ponlo en
 una sola columna usando la primera letra del nombre y el apellido. Ejemplo
 de formato: “Nombre: L. Dorado”.
 Pista: los apellidos pueden estar separadas o por un espacio o por un guion.*/
@@ -80,7 +96,14 @@ SELECT CONCAT(LEFT(nombre,1),".", " ",apellidos) as "Nombre Completo"
 from autor
 where fecha_muerte - fecha_nacimiento > 30
 
+/* Eejercicio 6: Muestra la duración media en horas de las reservas de espacios por cada
+año de aquellos años que tengan una duración media superior a un día.
+Para el año usarás el formato AA */b
 
+SELECT AVG(HOUR(fecha_fin - fecha_inicio)) as "Duracion_Media", year(fecha_inicio)
+from reservas
+group by year(fecha_inicio)
+having Duracion_media > 24;
 
 /*PROCEDIMIENTOS ALMACENADOS (RA5)
 Órdenes necesarias para implementar y ejecutar los procedimientos almacenados descritos en los enunciados.
