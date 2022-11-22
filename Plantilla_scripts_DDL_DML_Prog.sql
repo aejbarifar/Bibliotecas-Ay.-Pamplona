@@ -19,6 +19,15 @@ pizarra BOOLEAN NOT NULL,
 proyector BOOLEAN NOT NULL,
 megafonia BOOLEAN NOT NULL
 );
+DROP TABLE espacios;
+
+CREATE TABLE IF NOT EXISTS prestamos(
+codigo INTEGER PRIMARY KEY,
+fecha_prestamo DATETIME NOT NULL DEFAULT(now()),
+fecha_limite DATE NOT NULL,
+fecha_devolucion DATETIME,
+nº_renovaciones INT DEFAULT(0)
+);
 
 CREATE TABLE IF NOT EXISTS autor(
 codigo INT PRIMARY KEY,
@@ -46,6 +55,17 @@ Este fichero debe tener todas las órdenes necesarias para realizar las operacio
 
 /*INSERCIONES: Realiza todas las inserciones necesarias para que el resultado de las consultas arroje varios resultados, pero no todos los registros de una tabla.*/
 
+
+INSERT INTO `bibliotecas_ay_pamplona`.`prestamos` (`codigo`, `fecha_prestamo`, `fecha_limite`, `fecha_devolucion`, `nº_renovaciones`) VALUES ('3517', '2021-04-04 11:36:03', '2022-07-23', '2022-06-15 13:53:23', '5');
+INSERT INTO `bibliotecas_ay_pamplona`.`prestamos` (`codigo`, `fecha_prestamo`, `fecha_limite`, `fecha_devolucion`, `nº_renovaciones`) VALUES ('2347', '2022-04-14 15:36:19', '2022-04-18', '2022-04-22 17:34:14', '3');
+INSERT INTO `bibliotecas_ay_pamplona`.`prestamos` (`codigo`, `fecha_prestamo`, `fecha_limite`, `fecha_devolucion`, `nº_renovaciones`) VALUES ('8536', '2020-10-21 18:36:35', '2021-05-16', '2021-05-21 18:52:17', '1');
+INSERT INTO `bibliotecas_ay_pamplona`.`prestamos` (`codigo`, `fecha_prestamo`, `fecha_limite`, `fecha_devolucion`, `nº_renovaciones`) VALUES ('4739', '2018-08-14 14:36:21', '2022-02-19', '2022-02-19 05:42:41', '0');
+INSERT INTO `bibliotecas_ay_pamplona`.`prestamos` (`codigo`, `fecha_prestamo`, `fecha_limite`, `fecha_devolucion`, `nº_renovaciones`) VALUES ('0578', '2022-11-22 08:54:07', '2022-10-31', '2022-11-05 23:36:24', '14');
+INSERT INTO `bibliotecas_ay_pamplona`.`prestamos` (`codigo`, `fecha_prestamo`, `fecha_limite`, `fecha_devolucion`, `nº_renovaciones`) VALUES ('5832', '2019-04-06 06:36:57', '2022-12-28', '2023-01-04 12:14:27', '7');
+INSERT INTO `bibliotecas_ay_pamplona`.`prestamos` (`codigo`, `fecha_prestamo`, `fecha_limite`, `fecha_devolucion`, `nº_renovaciones`) VALUES ('5396', '2022-09-15 19:36:26', '2022-04-06', '2022-04-05 19:17:53', '9');
+
+
+
 INSERT INTO `bibliotecas_ay_pamplona`.`espacios` (`codigo`, `ubicacion`, `aforo`, `pizarra`, `proyector`, `megafonia`) VALUES ('1234', 'Sala 1', '15', '1', '1', '1');
 INSERT INTO `bibliotecas_ay_pamplona`.`espacios` (`codigo`, `ubicacion`, `aforo`, `pizarra`, `proyector`, `megafonia`) VALUES ('3421', 'Sala 2', '12', '1', '1', '0');
 INSERT INTO `bibliotecas_ay_pamplona`.`espacios` (`codigo`, `ubicacion`, `aforo`, `pizarra`, `proyector`, `megafonia`) VALUES ('2452', 'Sala 3', '13', '0', '0', '1');
@@ -64,9 +84,13 @@ INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, 
 INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, `fecha_nacimiento`, `fecha_muerte`, `pais_origen`) VALUES ('1567', 'Antonio', 'Machado', '1875-08-26', '1939-02-22', 'España');
 INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, `fecha_nacimiento`, `fecha_muerte`, `pais_origen`) VALUES ('6484', 'Miguel', 'De Cervantes', '1547-10-29', '1616-04-22', 'España');
 INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, `fecha_nacimiento`, `fecha_muerte`, `pais_origen`) VALUES ('1685', 'George', 'Gordon Byron', '1788-01-22', '1824-04-19', 'Reino Unido');
-INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, `fecha_nacimiento`, `fecha_muerte`, `pais_origen`) VALUES ('1574', 'William', 'Shakespeare', '1564-04-26', '1616-04-23', 'Reino Unido');
+INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, `fecha_nacimiento`, `fecha_muerte`, `pais_origen`) VALUES ('1574', 'William', 'Shakespear', '1564-04-26', '1616-04-23', 'Reino Unido');
 INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, `fecha_nacimiento`, `pais_origen`) VALUES ('5838', 'George', 'Raymond Richard Martin', '1948-10-20', 'Estados Unidos');
 INSERT INTO `bibliotecas_ay_pamplona`.`autor` (`codigo`, `nombre`, `apellidos`, `fecha_nacimiento`, `fecha_muerte`, `pais_origen`) VALUES ('9876', 'Ray', 'Bradbury', '1920-09-22', '2012-06-05', 'Estados Unidos');
+UPDATE `bibliotecas_ay_pamplona`.`autor` SET `apellidos` = 'Shakespearez' WHERE (`codigo` = '1574');
+UPDATE `bibliotecas_ay_pamplona`.`autor` SET `apellidos` = 'Gordon Byronrez' WHERE (`codigo` = '1685');
+UPDATE `bibliotecas_ay_pamplona`.`autor` SET `fecha_nacimiento` = '1788-01-14' WHERE (`codigo` = '1685');
+UPDATE `bibliotecas_ay_pamplona`.`autor` SET `fecha_nacimiento` = '1564-04-13' WHERE (`codigo` = '1574');
 
 INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('1932', '2022-11-21 17:23:05', '2022-11-21 18:30:23');
 INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('1832', '2022-12-18 11:30:00', '2022-12-11 12:30:00');
@@ -80,13 +104,25 @@ INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fec
 /*CONSULTAS: Nota: Se incluirá como comentario el enunciado de cada consulta.*/
 
 -- Diseña una consulta para...
+/*Ejercicio 1: Muestra el código de todos los préstamos, la fecha de inicio y los días de
+retraso de aquellos que hayan tenido más de tres días de retraso, pero
+menos de 10. La fecha de inicio tendrá el formato DD/MM/AA. Ordénalos
+de más a menos días de retraso. */
 
-/*Ejercicio 2: Necesitamos saber cuál es el nº de espacios, aforo máximo y aforo medio
-de todos los espacios que tienen Pizarra y Proyector.*/
+ select codigo, date_format(fecha_prestamo, "%d%m%y"), timestampdiff(DAY, fecha_limite, fecha_devolucion) as "retraso"
+ from prestamos
+ where timestampdiff(DAY, fecha_limite, fecha_devolucion) between 3 and 10
+ order by timestampdiff(DAY, fecha_limite, fecha_devolucion) desc;
  
- select count(*) as "nº Espacios", max(aforo) as "Aforo máximo" ,avg(aforo) as "Aforo medio" 
- from espacios
- where pizarra = true and proyector = true;
+ /*Ejercicio 3: Muestra el año medio de nacimiento de los autores cuyo apellido acaba
+en "rez" y han nacido en la primera quincena de un mes. */
+
+select avg(year(fecha_nacimiento))
+from autor
+where (apellidos like "%rez") and (day(fecha_nacimiento)between 1 and 15);
+ 
+
+
 
 /* Ejercicio 4: ¿Qué autores tienen más de 30 años y tienen un solo apellido? Ponlo en
 una sola columna usando la primera letra del nombre y el apellido. Ejemplo
@@ -96,9 +132,14 @@ SELECT CONCAT(LEFT(nombre,1),".", " ",apellidos) as "Nombre Completo"
 from autor
 where fecha_muerte - fecha_nacimiento > 30
 
+/* Ejercicio 5: Lista de países en mayúsculas con el número de escritores de cada país
+para países que tengan más de un escritor. Ten en cuenta solo los escritores
+vivos. 
+select mayus(
+
 /* Eejercicio 6: Muestra la duración media en horas de las reservas de espacios por cada
 año de aquellos años que tengan una duración media superior a un día.
-Para el año usarás el formato AA */b
+Para el año usarás el formato AA */
 
 SELECT AVG(HOUR(fecha_fin - fecha_inicio)) as "Duracion_Media", year(fecha_inicio)
 from reservas
