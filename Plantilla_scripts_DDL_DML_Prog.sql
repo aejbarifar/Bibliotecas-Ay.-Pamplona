@@ -114,6 +114,40 @@ Notas:
 -- Crea un procedimiento y pruébalo...
 CREATE PROCEDURE...
 CALL ...
+
+/* Ejercicio 4: Crea un procedimiento que reciba por parámetro un año y calcule el
+número medio, máximo y mínimo de minutos que han durado las reservas
+de espacios en ese año. Insertará esos datos en tres variables para después
+mostrarlos por pantalla de la siguiente manera: “Las reservas de espacios
+en el año W han tenido un tiempo mínimo de X minutos, un tiempo máximo
+de Y minutos y un tiempo medio de Z minutos”. */ 
+DELIMITER $$
+DROP PROCEDURE IF EXISTS reservas_año;
+CREATE PROCEDURE reservas_año (año YEAR)
+BEGIN
+	DECLARE media FLOAT;
+    DECLARE maximo FLOAT;
+    DECLARE minimo FLOAT;
+    DECLARE texto VARCHAR(60);
+    
+    SET media = select AVG(MINUTE(fecha_fin - fecha_inicio)) from reservas 
+    where year(fecha_inicio) == año; 
+    
+     SET maximo = select MAX(MINUTE(fecha_fin - fecha_inicio)) from reservas 
+    where year(fecha_inicio) == año; 
+    
+	 SET minimo = select MIN(MINUTE(fecha_fin - fecha_inicio)) from reservas 
+    where year(fecha_inicio) == año; 
+    
+    SET texto = CONCAT("Las reservas de espacios
+		en el año ", año, " han tenido un tiempo mínimo de ",minimo " minutos, un tiempo máximo
+		de ", maximo, " minutos y un tiempo medio de ", media, " minutos")
+        
+	select texto;
+END
+$$
+DELIMITER;
+    
 -- Crea una función y pruébala...
 CREATE FUNCTION ...
 SELECT ...
