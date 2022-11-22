@@ -45,6 +45,15 @@ fecha_inicio DATETIME NOT NULL,
 fecha_fin DATETIME NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS libros(
+isbn INT PRIMARY KEY,
+titulo VARCHAR(50) NOT NULL,
+anyo YEAR NOT NULL,
+numero_edicion INT NOT NULL,
+genero ENUM("Acción", "Fantasía", "Ciencia y Ficción", "Amor") NOT NULL,
+descripcion VARCHAR(50)
+);
+
 
 
 
@@ -101,6 +110,16 @@ INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fec
 INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('3358', '2022-12-13 21:00:00', '2022-12-16 19:00:00');
 INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('9976', '2022-11-28 14:32:00', '2022-11-30 19:00:00');
 
+INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('1843538452953', 'Los 3 cerditos', '2009', '2', 'Fantasía', 'Aventuras de 3 cerdos a los que les persigue un lobo');
+INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('4223162890371', 'Blancanieves', '2010', '5', 'Amor', 'Historia de amor entre una princesa y un principe');
+INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('1414485901070', 'Cronicas de Narnia', '2014', '6', 'Accion', '4 hermanos atraviesan un armario magico que les indroduce a un mundo paralelo fantastico');
+INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('9258972376260', 'Cars 2', '2017', '3', 'Acción', 'La historia de como Rayo McQueen consigue hacerse con la copa pistón');
+INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('3900231913438', 'Los 5 justos otra vez', '2006', '1', 'Fantasía', '3 hermanos, su prima y un perro se reunen de nuevo en verano para vivir aventuras inimaginables');
+INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('3340451941512', 'Regreso al futuro', '1999', '5', 'Ciencia y Ficción', 'Narra el proceso por el que pasa el protagonista para conseguir reparar la maquina que habia creado para viajar en el tiempo');
+INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('5217974631252', 'Geronimo Stilton', '2011', '8', 'Fantasía', 'Cuenta las aventuras de los sueños de un raton, en los que se adentra en mundos magicos con todo tipo de criaturas');
+INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('2660993476299', 'Codigo Lyoko', '2008', '3', 'Fantasia', 'Un grupo de amigos descubren un ordenador muy especial en el que encuentran un nuevo mundo virtual llamado Lyoko, ocupado por un virus y una joven de su edad');
+INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('2091566214299', 'Bajo la misma estrella', '2018', '11', 'Amor', 'Historia de amor en la que se hace incapie en la valoracion del tiempo de nuestra vida');
+
 /*CONSULTAS: Nota: Se incluirá como comentario el enunciado de cada consulta.*/
 
 -- Diseña una consulta para...
@@ -134,10 +153,14 @@ where fecha_muerte - fecha_nacimiento > 30
 
 /* Ejercicio 5: Lista de países en mayúsculas con el número de escritores de cada país
 para países que tengan más de un escritor. Ten en cuenta solo los escritores
-vivos. 
-select mayus(
+vivos. */
+select UPPER(pais_origen), count(pais_origen)
+from autor
+where (count(pais_origen) > 1) AND (fecha_muerte IS NULL)
+group by pais_origen;
 
-/* Eejercicio 6: Muestra la duración media en horas de las reservas de espacios por cada
+
+/* Ejercicio 6: Muestra la duración media en horas de las reservas de espacios por cada
 año de aquellos años que tengan una duración media superior a un día.
 Para el año usarás el formato AA */
 
@@ -145,6 +168,18 @@ SELECT AVG(HOUR(fecha_fin - fecha_inicio)) as "Duracion_Media", year(fecha_inici
 from reservas
 group by year(fecha_inicio)
 having Duracion_media > 24;
+
+/* Ejercicio 7: . Muestra los géneros que existen, cuantos libros hay de cada género y el
+total de caracteres que tienen todas las descripciones de los libros de cada
+género.
+Sigue el formato: "Género: X - Nº de libros: Y - Total caracteres de
+descripciones: Z".
+Ordénalas según la suma del tamaño de descripción de cada tipo de más
+larga a menos larga. */
+
+select genero, count(*), sum(char_length(descripcion))
+from libros
+order by sum(char_length(descripcion)) desc;
 
 /*PROCEDIMIENTOS ALMACENADOS (RA5)
 Órdenes necesarias para implementar y ejecutar los procedimientos almacenados descritos en los enunciados.
