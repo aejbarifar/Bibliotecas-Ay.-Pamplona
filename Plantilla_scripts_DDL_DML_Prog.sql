@@ -132,6 +132,14 @@ de más a menos días de retraso. */
  from prestamos
  where timestampdiff(DAY, fecha_limite, fecha_devolucion) between 3 and 10
  order by timestampdiff(DAY, fecha_limite, fecha_devolucion) desc;
+
+ /*Ejercicio 2: Necesitamos saber cuál es el nº de espacios, aforo máximo y aforo medio
+ de todos los espacios que tienen Pizarra y Proyector.*/
+ 
+ select count(*) as "nº Espacios", max(aforo) as "Aforo máximo" ,avg(aforo) as "Aforo medio"
+ from espacios
+ where pizarra = 1 and proyector = 1;
+
  
  /*Ejercicio 3: Muestra el año medio de nacimiento de los autores cuyo apellido acaba
 en "rez" y han nacido en la primera quincena de un mes. */
@@ -149,7 +157,7 @@ de formato: “Nombre: L. Dorado”.
 Pista: los apellidos pueden estar separadas o por un espacio o por un guion.*/
 SELECT CONCAT(LEFT(nombre,1),".", " ",apellidos) as "Nombre Completo"
 from autor
-where fecha_muerte - fecha_nacimiento > 30;
+where TIMESTAMPDIFF(YEAR,fecha_nacimiento, fecha_muerte) > 30
 
 /* Ejercicio 5: Lista de países en mayúsculas con el número de escritores de cada país
 para países que tengan más de un escritor. Ten en cuenta solo los escritores */
@@ -160,11 +168,11 @@ group by pais_origen
 having count(pais_origen) > 1;
 
 
-/* Ejercicio 6: Muestra la duración media en horas de las reservas de espacios por cada
+/* Eejercicio 6: Muestra la duración media en horas de las reservas de espacios por cada
 año de aquellos años que tengan una duración media superior a un día.
 Para el año usarás el formato AA */
-
-SELECT AVG(HOUR(fecha_fin - fecha_inicio)) as "Duracion_Media", year(fecha_inicio)
+-- Poner formato AA.
+SELECT AVG(TIMESTAMPDIFF(HOUR,fecha_inicio, fecha_fin)) as "Duracion_Media", year(fecha_inicio)
 from reservas
 group by year(fecha_inicio)
 having Duracion_media > 24;
@@ -197,7 +205,34 @@ número medio, máximo y mínimo de minutos que han durado las reservas
 de espacios en ese año. Insertará esos datos en tres variables para después
 mostrarlos por pantalla de la siguiente manera: “Las reservas de espacios
 en el año W han tenido un tiempo mínimo de X minutos, un tiempo máximo
-de Y minutos y un tiempo medio de Z minutos”. */ 
+de Y minutos y un tiempo medio de Z minutos”. */
+DROP PROCEDURE IF EXISTS reservas_año;
+DELIMITER $$
+CREATE PROCEDURE reservas_año (año YEAR)
+BEGIN
+DECLARE media FLOAT;
+    DECLARE maximo FLOAT;
+    DECLARE minimo FLOAT;
+    DECLARE texto VARCHAR(500);
+   
+    SET media = (SELECT AVG(TIMESTAMPDIFF(MINUTE,fecha_inicio, fecha_fin)) from reservas
+    where year(fecha_inicio) = año);
+   
+     SET maximo = (SELECT MAX(TIMESTAMPDIFF(MINUTE,fecha_inicio, fecha_fin)) from reservas
+    where year(fecha_inicio) = año);
+   
+SET minimo = (SELECT MIN(TIMESTAMPDIFF(MINUTE,fecha_inicio, fecha_fin)) from reservas
+    where year(fecha_inicio) = año);
+   
+    SET texto = CONCAT("Las reservas de espacios
+    en el año ", año, " han tenido un tiempo mínimo de ", minimo , " minutos, un tiempo máximo
+    de ", maximo, " minutos y un tiempo medio de ", media, " minutos");
+       
+    select texto;
+  END
+  $$
+DELIMITER ;
+Call reservas_año(2023);
 
     
 -- Crea una función y pruébala...
@@ -208,6 +243,21 @@ de Y minutos y un tiempo medio de Z minutos”. */
 y un país. La función devolverá la diferencia en años entre la edad media
 de ese país y la edad correspondiente a la fecha de nacimiento pasada
 por parámetro */
+DELIMITER $$
+CREATE FUNCTION diferencia_media (fecha_nacido DATE, pais VARCHAR(30)) RETURNS int
+BEGIN
+DECLARE edad_media float;
+DECLARE años_pasados FLOAT;
+   
+    SET edad_media = (select avg(TIMESTAMPDIFF(YEAR,fecha_nacimiento,fecha_muerte)) from autor where pais_origen = pais);
+SET años_pasados = (SELECT avg(TIMESTAMPDIFF(YEAR,fecha_nacido,fecha_nacimiento)));
+   
+    select edad_media, años_pasados;
+                     
+END
+$$
+DELIMITER ;
+select diferencia_media(1875, "España") from autor;
 
 
 -- Crea un trigger y pruébalo...
