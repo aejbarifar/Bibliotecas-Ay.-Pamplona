@@ -177,7 +177,7 @@ año de aquellos años que tengan una duración media superior a un día.
 Para el año usarás el formato AA */
 -- Poner formato AA.
 
-SELECT AVG(TIMESTAMPDIFF(HOUR,fecha_inicio, fecha_fin)) as "Duracion_Media", year(fecha_inicio)
+SELECT AVG(TIMESTAMPDIFF(HOUR,fecha_inicio, fecha_fin)) as "Duracion_Media", DATE_FORMAT(fecha_inicio, "%y")
 from reservas
 group by year(fecha_inicio)
 having Duracion_media > 24;
