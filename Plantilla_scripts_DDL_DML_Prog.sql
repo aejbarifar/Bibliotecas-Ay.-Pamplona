@@ -109,6 +109,8 @@ INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fec
 INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('9778', '2023-06-19 18:00:00', '2023-06-21 12:00:00');
 INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('3358', '2022-12-13 21:00:00', '2022-12-16 19:00:00');
 INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('9976', '2022-11-28 14:32:00', '2022-11-30 19:00:00');
+INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('6656', '2022-08-23 17:00:00', '2022-09-01 17:00:00');
+INSERT INTO `bibliotecas_ay_pamplona`.`reservas` (`codigo`, `fecha_inicio`, `fecha_fin`) VALUES ('9382', '2022-05-19 19:32:00', '2022-05-21 19:00:00');
 
 INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('18435384', 'Los 3 cerditos', '2009', '2', 'Fantasía', 'Aventuras de 3 cerdos a los que les persigue un lobo');
 INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('42231628', 'Blancanieves', '2010', '5', 'Amor', 'Historia de amor entre una princesa y un principe');
@@ -155,12 +157,14 @@ where (apellidos like "%rez") and (day(fecha_nacimiento)between 1 and 15);
 una sola columna usando la primera letra del nombre y el apellido. Ejemplo
 de formato: “Nombre: L. Dorado”.
 Pista: los apellidos pueden estar separadas o por un espacio o por un guion.*/
+
 SELECT CONCAT(LEFT(nombre,1),".", " ",apellidos) as "Nombre Completo"
 from autor
-where TIMESTAMPDIFF(YEAR,fecha_nacimiento, fecha_muerte) > 30
+where TIMESTAMPDIFF(YEAR,fecha_nacimiento, fecha_muerte) > 30;
 
 /* Ejercicio 5: Lista de países en mayúsculas con el número de escritores de cada país
 para países que tengan más de un escritor. Ten en cuenta solo los escritores */
+
 select UPPER(pais_origen), count(pais_origen)
 from autor
 where (fecha_muerte IS NULL)
@@ -172,6 +176,7 @@ having count(pais_origen) > 1;
 año de aquellos años que tengan una duración media superior a un día.
 Para el año usarás el formato AA */
 -- Poner formato AA.
+
 SELECT AVG(TIMESTAMPDIFF(HOUR,fecha_inicio, fecha_fin)) as "Duracion_Media", year(fecha_inicio)
 from reservas
 group by year(fecha_inicio)
@@ -190,6 +195,8 @@ from libros
 group by genero
 order by sum(char_length(descripcion)) desc;
 
+SET GLOBAL log_bin_trust_function_creators = 1;
+
 /*PROCEDIMIENTOS ALMACENADOS (RA5)
 Órdenes necesarias para implementar y ejecutar los procedimientos almacenados descritos en los enunciados.
 Notas: 
@@ -206,6 +213,7 @@ de espacios en ese año. Insertará esos datos en tres variables para después
 mostrarlos por pantalla de la siguiente manera: “Las reservas de espacios
 en el año W han tenido un tiempo mínimo de X minutos, un tiempo máximo
 de Y minutos y un tiempo medio de Z minutos”. */
+
 DROP PROCEDURE IF EXISTS reservas_año;
 DELIMITER $$
 CREATE PROCEDURE reservas_año (año YEAR)
@@ -219,9 +227,9 @@ DECLARE media FLOAT;
     where year(fecha_inicio) = año);
    
      SET maximo = (SELECT MAX(TIMESTAMPDIFF(MINUTE,fecha_inicio, fecha_fin)) from reservas
-    where year(fecha_inicio) = año);
+     where year(fecha_inicio) = año);
    
-SET minimo = (SELECT MIN(TIMESTAMPDIFF(MINUTE,fecha_inicio, fecha_fin)) from reservas
+	SET minimo = (SELECT MIN(TIMESTAMPDIFF(MINUTE,fecha_inicio, fecha_fin)) from reservas
     where year(fecha_inicio) = año);
    
     SET texto = CONCAT("Las reservas de espacios
@@ -234,7 +242,7 @@ SET minimo = (SELECT MIN(TIMESTAMPDIFF(MINUTE,fecha_inicio, fecha_fin)) from res
 DELIMITER ;
 Call reservas_año(2023);
 
-    
+
 -- Crea una función y pruébala...
 -- CREATE FUNCTION ...
 -- SELECT ...
@@ -243,21 +251,23 @@ Call reservas_año(2023);
 y un país. La función devolverá la diferencia en años entre la edad media
 de ese país y la edad correspondiente a la fecha de nacimiento pasada
 por parámetro */
+
 DELIMITER $$
-CREATE FUNCTION diferencia_media (fecha_nacido DATE, pais VARCHAR(30)) RETURNS int
+CREATE FUNCTION diferencia_media (fecha_nacido DATE, pais VARCHAR(30)) RETURNS float
 BEGIN
 DECLARE edad_media float;
 DECLARE años_pasados FLOAT;
+DECLARE diferencia Float;
    
     SET edad_media = (select avg(TIMESTAMPDIFF(YEAR,fecha_nacimiento,fecha_muerte)) from autor where pais_origen = pais);
-SET años_pasados = (SELECT avg(TIMESTAMPDIFF(YEAR,fecha_nacido,fecha_nacimiento)));
+	SET años_pasados = (TIMESTAMPDIFF(YEAR,fecha_nacido,now()));
+    SET diferencia = (edad_media - años_pasados);
    
-    select edad_media, años_pasados;
-                     
+     return diferencia;                
 END
 $$
 DELIMITER ;
-select diferencia_media(1875, "España") from autor;
+select diferencia_media("1990-12-11", "España");
 
 
 -- Crea un trigger y pruébalo...
