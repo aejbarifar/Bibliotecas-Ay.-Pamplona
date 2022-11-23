@@ -119,7 +119,7 @@ INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numer
 INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('39002319', 'Los 5 justos otra vez', '2006', '1', 'Fantasía', '3 hermanos, su prima y un perro se reunen de nuevo en verano para vivir aventuras inimaginables');
 INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('33404512', 'Regreso al futuro', '1999', '5', 'Ciencia y Ficción', 'Narra el proceso por el que pasa el protagonista para conseguir reparar la maquina que habia creado para viajar en el tiempo');
 INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('52179746', 'Geronimo Stilton', '2011', '8', 'Fantasía', 'Cuenta las aventuras de los sueños de un raton, en los que se adentra en mundos magicos con todo tipo de criaturas');
-INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('26609934', 'Codigo Lyoko', '2008', '3', 'Fantasia', 'Un grupo de amigos descubren un ordenador muy especial en el que encuentran un nuevo mundo virtual llamado Lyoko, ocupado por un virus y una joven de su edad');
+INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('26609934', 'Codigo Lyoko', '2008', '3', 'Fantasía', 'Un grupo de amigos descubren un ordenador muy especial en el que encuentran un nuevo mundo virtual llamado Lyoko, ocupado por un virus y una joven de su edad');
 INSERT INTO `bibliotecas_ay_pamplona`.`libros` (`isbn`, `titulo`, `anyo`, `numero_edicion`, `genero`, `descripcion`) VALUES ('20915662', 'Bajo la misma estrella', '2018', '11', 'Amor', 'Historia de amor en la que se hace incapie en la valoracion del tiempo de nuestra vida');
 
 /*CONSULTAS: Nota: Se incluirá como comentario el enunciado de cada consulta.*/
@@ -207,6 +207,30 @@ Notas:
 -- CREATE PROCEDURE...
 -- CALL ...
 
+/* Ejercicio 1: Escribe una función que recibirá por parámetro una cadena de caracteres
+con el valor de un género. La función devolverá el número de libros de ese
+género solo para los géneros que tengan más de un libro asociado. Usa esa
+función en una consulta que escribirá por pantalla lo siguiente: “El número
+de libros del género X es de Y libros”. */
+
+DELIMITER $$
+CREATE FUNCTION numero_genero (gen VARCHAR(50)) RETURNS longtext
+BEGIN
+    DECLARE n_libros INTEGER;
+    DECLARE nombre_gen VARCHAR(30);
+    DECLARE texto VARCHAR(500);
+   
+    SET nombre_gen = gen;
+    SET n_libros = (SELECT (count(*)) from libros where count(genero) > 1);
+     
+    SET texto = CONCAT("El número de libros del género ", gen, " es de ", n_libros, " libros ");
+       
+    return texto;
+  END
+  $$
+DELIMITER ;
+-- select numero_genero("Fantasía");
+
 /* Ejercicio 4: Crea un procedimiento que reciba por parámetro un año y calcule el
 número medio, máximo y mínimo de minutos que han durado las reservas
 de espacios en ese año. Insertará esos datos en tres variables para después
@@ -275,3 +299,40 @@ select diferencia_media("1990-12-11", "España");
 -- INSERT...
 
 -- ETC.
+/*Ejercicio 3: Crea un procedimiento que reciba un número entero entre 1 y 7, calcule el
+número de préstamos que se han realizado ese día de la semana, lo almacene en una variable, y lo muestre por pantalla siguiendo el patrón
+mostrado: "El total de préstamos realizados un Tuesday ha sido de X". */
+
+DROP PROCEDURE IF EXISTS prestamos_dia;
+DELIMITER $$
+CREATE PROCEDURE prestamos_dia (numero int)
+BEGIN
+    DECLARE num_prestamos INTEGER;
+    DECLARE dia VARCHAR(50);
+    DECLARE texto VARCHAR(500);
+   CASE numero
+   WHEN 1 THEN
+        SET dia = "Domingo";
+   WHEN 2 THEN
+        SET dia = "Lunes";
+   WHEN 3 THEN
+        SET dia = "Martes";
+   WHEN 4 THEN
+        SET dia = "Miercoles";
+   WHEN 5 THEN
+        SET dia = "Jueves";
+   WHEN 6 THEN
+        SET dia = "Viernes";
+   WHEN 7 THEN
+        SET dia = "Sabado";
+  END CASE ;
+   
+   SET num_prestamos = (SELECT (count(*)) from prestamos where date_format(fecha_prestamo, "%W" ) = dia);
+   
+    SET texto = CONCAT("El total de préstamos realizados un ", dia, "ha sido de ", num_prestamos);
+       
+    select texto;
+  END
+  $$
+DELIMITER ;
+Call prestamos_dia(4);
